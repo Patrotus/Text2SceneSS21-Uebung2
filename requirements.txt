@@ -50,3 +50,5 @@ wheel=0.36.2=pyhd3eb1b0_0
 win_inet_pton=1.1.0=py38haa95532_0
 wincertstore=0.2=py38_0
 zipp=3.4.1=pyhd3eb1b0_0
+
+spacy~=2.3.5
