@@ -1,14 +1,10 @@
 import os
-
 import spacy
-import xml.etree.ElementTree as EleTr
 
 from progress_bar import progress
+from file_analyzer import FileAnalyzer
 
 nlp = spacy.load("en_core_web_sm")
-
-
-
 
 
 def load_data():
@@ -26,33 +22,31 @@ def load_data():
         for file in files:
             if file.endswith(".xml"):
                 file_path = os.path.join(root, file)
-                read_file(file_path)
+                fa = FileAnalyzer(file_path, nlp)
+                fa.analyse_text()
             prog += 1
             progress(prog, file_count, 'Reading files')
 
 
-def read_file(name):
-    """
-    Opens a file and reads its content
-    :param name: Path of the file
-    """
-    f = open(name, "r", encoding="utf8")
+##### DEAD CODE: Only as Lookup ############
+#
+# def read_file(name):
+#     """
+#     Opens a file and reads its content
+#     :param name: Path of the file
+#     """
+#     f = open(name, "r", encoding="utf8")
+#     tree = EleTr.parse(name)
+#     root = tree.getroot()
+#
+#     # List of tags
+#     tags = root.findall('TAGS')[0]
+#     # Creates a processed doc
+#
+#     # Creates a XML-Tree for given file
+#     # Gets Attributes for a Tag
+#     for i in tags.findall('PLACE'):
+#         pass
+#         # print(i.attrib)
+############################################
 
-    doc = nlp(f.read())
-    for token in doc:
-        pass
-        # print(token.text)
-
-    # Creates a XML-Tree for given file
-    tree = EleTr.parse(name)
-    root = tree.getroot()
-    text = root.findall('TEXT')[0]
-    tags = root.findall('TAGS')[0]
-    # Gets Attributes for a Tag
-    for i in tags.findall('PLACE'):
-        pass
-        # print(i.attrib)
-
-
-def get_data(file):
-    pass
