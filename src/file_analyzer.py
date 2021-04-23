@@ -2,7 +2,7 @@ import xml.etree.ElementTree as EleTr
 
 
 class FileAnalyzer:
-    pos_dict = { }
+    pos_dict = {}
 
     def __init__(self, path, nlp):
         """
