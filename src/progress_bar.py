@@ -6,7 +6,7 @@ def progress(count, total, suffix=''):
     Renders a progress bar
     :param count: Current count
     :param total: Total count of objects
-    :param suffix: Message to be added
+    :param suffix: Message at the end of the bar
     """
     bar_len = 60
     filled_len = int(round(bar_len * count / float(total)))
