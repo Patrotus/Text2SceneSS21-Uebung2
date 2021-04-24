@@ -1,5 +1,5 @@
-from file_handler import load_data
+from file_handler import analyze_data
 
 if __name__ == '__main__':
-    load_data()
+    analyze_data()
 
