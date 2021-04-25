@@ -7,28 +7,33 @@ from progress_bar import progress
 nlp = spacy.load("en_core_web_sm")
 
 
-def analyze_data():
+def analyze_all_files(path):
     """
     Loads all .xml-files form the resources folder and analyzes them
     """
-    training_data_location = os.path.join('.', 'resources', 'training', 'Training')
 
-    file_count = sum(len(files) for _, _, files in os.walk(training_data_location))
+    file_count = sum(len(files) for _, _, files in os.walk(path))
     prog = 0
 
     fa_array = []
     # Root = current_folder, dirs = list of dirnames, files = list of filenames
-    for root, _, files in os.walk(training_data_location):
+    for root, _, files in os.walk(path):
         for file in files:
             if file.endswith(".xml"):
                 file_path = os.path.join(root, file)
-                fa = FileAnalyzer(file_path, nlp)
-                fa_array.append(fa)
+                Fa = FileAnalyzer(file_path, nlp)
+                fa_array.append(Fa)
             prog += 1
             progress(prog, file_count, 'Reading files')
     print('\n' + 'Done reading files. Analysis is starting.')
 
-    a = Analyzer(fa_array)
-    a.plot_sentence_distribution()
+    A = Analyzer(fa_array)
+    A.plot_sentence_distribution()
 
-    a.debug()
+    A.debug()
+
+def analyze_and_graph(files):
+    print('Starting analysis of the single files.')
+    for file in files:
+        fa = FileAnalyzer(file, nlp)
+        fa.visualize()
