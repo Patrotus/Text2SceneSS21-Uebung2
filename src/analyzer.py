@@ -1,92 +1,90 @@
-from dict_functions import update_dict_occurences
+from dict_functions import update_dict_occurences, update_dict_amount
 import matplotlib.pyplot as plt
 
 
 class Analyzer:
+    sentences = {}
+    total_pos = {}
+    total_tag = {}
+    qs_type_dict = {}
+    verbs = {}
+    link_pre = {}
+
     def __init__(self, fas):
         self.fas = fas
-        self.sentences = []
-        self.total_pos, self.total_tag, self.verbs, self.sentences = self.analyze()
+        self.analyze()
+
+        # Brings the sentences and verbs in the required format
+        sent_items = list(self.sentences.items())
+        sent_items.sort(key=lambda tup: tup[0])
+        self.sentences_array = sent_items
+        verbs = list(self.verbs.items())
+        verbs.sort(key=lambda tup: tup[1], reverse=True)
+        self.verbs_array = verbs[:5]
+
+    def debug(self):
+        print(self.total_tag)
+        print(self.total_pos)
+        print(self.verbs_array)
+        print(self.qs_type_dict)
+        print(self.link_pre)
 
     def analyze(self):
-        sentence_length = {}
-        total_pos = {}
-        total_tag = {}
-        verbs = {}
-
         for fa in self.fas:
             fa_pos_counter = fa.get_pos_counter()
-            fa_tag_dict = fa.get_tag_dict()
+            self.update_total_pos(fa_pos_counter)
+
+            fa_tags = fa.get_tags()
+            self.update_tag_dicts(fa_tags)
+
             fa_sentences = fa.get_sentences()
+            self.update_sentence_lengths(fa_sentences)
 
-            sentence_length = self.get_sentence_distribution(sentence_length, fa_sentences)
-        sentence_items = list(sentence_length.items())
-        sentence_items.sort(key=lambda tup: tup[0])
+    def update_tag_dicts(self, fa_tags):
+        """
+        Performs all neccesary updates for the tags of a documents
+        :param fa_tags:
+        """
+        for item in fa_tags:
+            tag = item.tag
+            # Updates QSLINK type distribution
+            if tag == 'QSLINK':
+                update_dict_occurences(self.qs_type_dict, item.attrib['relType'])
+            # Updates the preposition distribution for QS and OLINK
+            if tag == 'QSLINK' or tag == 'OLINK':
+                if item.attrib['trigger']:
+                    trigger_id = item.attrib['trigger']
+                    tag_list = fa_tags.findall(f"./SPATIAL_SIGNAL[@id='{trigger_id}']")
+                    if len(tag_list) > 0:
+                        pre = tag_list[0].attrib['text']
+                        update_dict_occurences(self.link_pre, pre)
+            # Updates the distribution for motion verbs
+            elif tag == 'MOTION':
+                update_dict_occurences(self.verbs, item.attrib['text'])
+            update_dict_occurences(self.total_tag, tag)
 
-
-        return self.count_pos_tags(), self.count_tags(), self.count_motion_verb(), sentence_items
-
-    def get_sentence_distribution(self, sent_dict, sentences):
+    def update_sentence_lengths(self, sentences):
+        """
+        Updates the distribution of sentence lenghts
+        :param sentences:
+        """
         for sent in sentences:
-            update_dict_occurences(sent_dict, sent)
-        return sent_dict
+            update_dict_occurences(self.sentences, sent)
 
-    # TODO: Refacotring: Dont iterate over fas multiple times
-    def count_pos_tags(self):
-        total_pos = {}
-        for fa in self.fas:
-            fa_pos_counter = fa.get_pos_counter()
-            for key in fa_pos_counter:
-                if key in total_pos:
-                    total_pos[key] += fa_pos_counter[key]
-                else:
-                    total_pos[key] = fa_pos_counter[key]
-        return total_pos
-
-    def count_tags(self):
-        total_tag = {}
-        for fa in self.fas:
-            fa_tag_dict = fa.get_tag_dict()
-            for key in fa_tag_dict:
-                if key in total_tag:
-                    total_tag[key] += len(fa_tag_dict[key])
-                else:
-                    total_tag[key] = len(fa_tag_dict[key])
-        return total_tag
-
-    def sentence_distribution(self):
-        sentence_length = {}
-        for fa in self.fas:
-            sentences = fa.get_sentences()
-            for sent in sentences:
-                if sent in sentence_length:
-                    sentence_length[sent] += 1
-                else:
-                    sentence_length[sent] = 1
-        # Orders the dict ascending before returning it.
-        sent_items = list(sentence_length.items())
-        sent_items.sort(key=lambda tup: tup[0])
-        return sent_items
-
-    def count_motion_verb(self):
-        verbs = {}
-        for fa in self.fas:
-            fa_tag_dict = fa.get_tag_dict()
-            if 'MOTION' in fa_tag_dict:
-                for verb in fa_tag_dict['MOTION']:
-                    motion_verb = verb['text']
-                    if motion_verb in verbs:
-                        verbs[motion_verb] += 1
-                    else:
-                        verbs[motion_verb] = 1
-        # Sorts the dictionary and returns the 5 tuples with the most entries
-        dict_items = list(verbs.items())
-        dict_items.sort(key=lambda tup: tup[1], reverse=True)
-        return dict_items[:5]
+    def update_total_pos(self, fa_pos_counter):
+        """
+        Updates the distribution of the pos tags
+        :param fa_pos_counter:
+        """
+        for key in fa_pos_counter:
+            update_dict_amount(self.total_pos, key, fa_pos_counter[key])
 
     def plot_sentence_distribution(self):
+        """
+        Plots the distribution of the sentences lengths
+        """
         x_val, y_val = [], []
-        for x in self.sentences:
+        for x in self.sentences_array:
             x_val.append(x[0])
             y_val.append(x[1])
         plt.scatter(x_val, y_val, s=2, c="black", marker='o')

@@ -1,6 +1,5 @@
 import xml.etree.ElementTree as EleTr
-
-from dict_functions import update_dict_array, update_dict_occurences
+from dict_functions import update_dict_occurences
 
 
 class FileAnalyzer:
@@ -14,17 +13,10 @@ class FileAnalyzer:
         root = EleTr.parse(path).getroot()
 
         text = root.findall('TEXT')[0].text
-        tags = root.findall('TAGS')[0]
+        self.tags = root.findall('TAGS')[0]
         self.doc = nlp(text)
-        self.tag_dict = self.create_tag_dict(tags)
         self.pos_counter = self.create_pos_counter_dict()
         self.sentences = self.create_sentences_array()
-
-    def create_tag_dict(self, tags):
-        tag_dict = {}
-        for child in tags:
-            update_dict_array(tag_dict, child.tag, child.attrib)
-        return tag_dict
 
     def create_pos_counter_dict(self):
         pos_counter = {}
@@ -42,8 +34,8 @@ class FileAnalyzer:
     def get_pos_counter(self):
         return self.pos_counter
 
-    def get_tag_dict(self):
-        return self.tag_dict
+    def get_tags(self):
+        return self.tags
 
     def get_sentences(self):
         return self.sentences

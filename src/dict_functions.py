@@ -5,15 +5,13 @@ def update_dict_occurences(up_dict, key):
     :param up_dict: Dcitionary to be updated
     """
     if key in up_dict:
-        up_dict[key] = up_dict[key] + 1
+        up_dict[key] += 1
     else:
         up_dict[key] = 1
 
 
-def update_dict_array(up_dict, key, value):
+def update_dict_amount(up_dict, key, value):
     if key in up_dict:
-        array = up_dict[key]
-        array.append(value)
-        up_dict[key] = array
+        up_dict[key] += value
     else:
-        up_dict[key] = [value]
+        up_dict[key] = value

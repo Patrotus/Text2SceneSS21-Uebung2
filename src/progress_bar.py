@@ -1,6 +1,5 @@
 import sys
 
-
 def progress(count, total, suffix=''):
     """
     Renders a progress bar
