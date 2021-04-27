@@ -45,6 +45,7 @@ class FileAnalyzer:
         sentences = []
         for sent in self.doc.sents:
             sentences.append(len(sent.text))
+        sentences = [len(sent) for sent in self.doc.sents]
         return sentences
 
     def get_pos_counter(self):
@@ -64,9 +65,9 @@ class FileAnalyzer:
         tags = self.tags
         metalink_tags = [tag for tag in tags if tag.tag == 'METALINK']
         rest_tags = [tag for tag in tags if tag.tag != 'METALINK']
-        # for tag in metalink_tags:
-        #     from_id, to_id = tag.attrib['fromID'], tag.attrib['toID']
-        #     rest_tags = self.remove_and_replace(from_id, to_id, rest_tags)
+        for tag in metalink_tags:
+            from_id, to_id = tag.attrib['fromID'], tag.attrib['toID']
+            rest_tags = self.remove_and_replace(from_id, to_id, rest_tags)
 
         # TODO: Tags vorher mergen
         merged_tags = []
@@ -96,10 +97,12 @@ class FileAnalyzer:
 
         print(count)
 
-        graph.render(f'test-output/{file_name}_test.gv', view=True)
+        file_name = f'test-output/{file_name}.gv'
+        graph.render(file_name, view=True)
+        os.remove(file_name)
 
+    #FIXME: Ist das richtig so?
     def remove_and_replace(self, old, new, tags):
-        print(type(tags))
         for tag in tags:
             if tag.attrib['id'] == old:
                 tags.remove(tag)
