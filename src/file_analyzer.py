@@ -1,16 +1,20 @@
-import time
+import os
 import xml.etree.ElementTree as EleTr
 from dict_functions import update_dict_occurences
-import networkx as nx
-import matplotlib.pyplot as plt
+import graphviz as gviz
 
+NODE_TAGS = {
+    'PLACE': 'green',
+    'LOCATION': 'lightblue',
+    'SPATIAL_ENTITY': 'yellow',
+    'NONMOTION_EVENT': 'red',
+    'MOTION': 'purple',
+    'PATH': "orange"
+}
 
-VISUALIZED_TAGS = {
-    'PLACE': 'red',
-    'LOCATION': 'green',
-    'SPATIAL_ENTITY': 'blue',
-    'NONMOTION_EVENT': 'yellow',
-    'PATH': 'orange'
+EDGE_TAGS = {
+    'QSLINK': 'solid',
+    'OLINK': 'dashed'
 }
 
 
@@ -53,39 +57,54 @@ class FileAnalyzer:
         return self.sentences
 
     def visualize(self):
-        G = nx.Graph()
-        color_map = []
-        i = 1
-        for tag in self.tags:
+        file_name = self.path.split(os.sep)[-1][0:-4]
+
+        graph = gviz.Digraph(comment=file_name, engine='circo')
+
+        tags = self.tags
+        metalink_tags = [tag for tag in tags if tag.tag == 'METALINK']
+        rest_tags = [tag for tag in tags if tag.tag != 'METALINK']
+        # for tag in metalink_tags:
+        #     from_id, to_id = tag.attrib['fromID'], tag.attrib['toID']
+        #     rest_tags = self.remove_and_replace(from_id, to_id, rest_tags)
+
+        # TODO: Tags vorher mergen
+        merged_tags = []
+
+        node_tags = [tag for tag in rest_tags if tag.tag in NODE_TAGS]
+        edge_tags = [tag for tag in rest_tags if tag.tag in EDGE_TAGS]
+
+        # Renders all Nodes
+        count = 0
+        for tag in node_tags:
+            count += 1
+            graph.node(name=tag.attrib['id'], label=tag.attrib['text'], fillcolor=NODE_TAGS[tag.tag], style='filled')
+
+        # Renders all Edges
+        for tag in edge_tags:
             tag_name = tag.tag
-            if tag_name in VISUALIZED_TAGS:
-                text = tag.attrib['text']
-                print(tag.attrib['id'])
-                G.add_node(i, id=tag.attrib['id'], label=text, tag=tag_name)
-                # color_map.append(VISUALIZED_TAGS[tag_name])
-                i += 1
-            if tag_name == 'METALINK':
-                # TODO: Wie mit dem mergen in diesen Fällen umzugehen?
-                from_id = tag.attrib['fromID']
-                to_id = tag.attrib['toID']
-                print(from_id, to_id)
-                from_node_id = list((n, d['id']) for n, d in G.nodes().items() if d['id'] == from_id)
-                to_node_id = list((n, d['id']) for n, d in G.nodes().items() if d['id'] == to_id)
-                if len(from_node_id) > 0 and len(to_node_id) > 0:
-                    G = nx.contracted_nodes(G, from_node_id[0][0], to_node_id[0][0])
+            graph.edge(tail_name=tag.attrib['fromID'], head_name=tag.attrib['toID'], label=tag.attrib['relType'],
+                       style=EDGE_TAGS[tag_name])
 
-        # Use label attribute as value instead of id
-        labels = nx.get_node_attributes(G, 'label')
-        # nx.draw(G, labels=labels, node_color=color_map, with_labels=True)
-        nx.draw(G, labels=labels, with_labels=True)
-        plt.show()
+        # Renders a legend explaining the colors and arrows
+        label = '<<TABLE>'
+        for tag in NODE_TAGS:
+            label += f'<TR><TD BGCOLOR="{NODE_TAGS[tag]}">{tag}</TD></TR>'
+        label += '<TR><TD>QSLINK --- &gt;</TD></TR><TR><TD>OLINK - - - &gt;</TD></TR>'
+        label += '</TABLE>>'
+        graph.attr(label=label)
 
+        print(count)
 
+        graph.render(f'test-output/{file_name}_test.gv', view=True)
 
-# M = nx.contracted_nodes(G, u, v)
-
-
-
-
-
-
+    def remove_and_replace(self, old, new, tags):
+        print(type(tags))
+        for tag in tags:
+            if tag.attrib['id'] == old:
+                tags.remove(tag)
+            elif 'fromID' in tag.attrib and tag.attrib['fromID'] == old:
+                tag.attrib['fromID'] = new
+            elif 'toID' in tag.attrib and tag.attrib['toID'] == old:
+                tag.attrib['toID'] = new
+        return tags

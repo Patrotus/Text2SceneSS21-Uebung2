@@ -53,8 +53,7 @@ class Analyzer:
             # Updates the preposition distribution for QS and OLINK
             if tag == 'QSLINK' or tag == 'OLINK':
                 if item.attrib['trigger']:
-                    trigger_id = item.attrib['trigger']
-                    tag_list = fa_tags.findall(f"./SPATIAL_SIGNAL[@id='{trigger_id}']")
+                    tag_list = fa_tags.findall(f"./SPATIAL_SIGNAL[@id='{item.attrib['trigger']}']")
                     if len(tag_list) > 0:
                         pre = tag_list[0].attrib['text']
                         update_dict_occurences(self.link_pre, pre)
