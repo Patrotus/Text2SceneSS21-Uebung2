@@ -2,8 +2,8 @@ import os
 import xml.etree.ElementTree as EleTr
 import graphviz as gviz
 
-from dict_functions import update_dict_occurences
-from question import question
+from analysis.dict_functions import update_dict_occurences
+from analysis.question import question
 
 # Constants defining the color and arrow style for some tags
 NODE_TAGS = {
@@ -94,8 +94,8 @@ class FileAnalyzer:
 
         # Renders all Edges
         for tag in edge_tags:
-            graph.edge(tail_name=tag.attrib['fromID'], head_name=tag.attrib['toID'], label=tag.attrib['relType'],
-                       style=EDGE_TAGS[tag.tag])
+            graph.edge(tail_name=tag.attrib['fromID'], head_name=tag.attrib['toID'],
+                       label=tag.attrib['relType'], style=EDGE_TAGS[tag.tag], arrowhead='none')
 
         # Renders a legend explaining the colors and arrows
         label = '<<TABLE>'

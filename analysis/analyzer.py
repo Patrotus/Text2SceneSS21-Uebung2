@@ -1,7 +1,7 @@
 import os
 import matplotlib.pyplot as plt
-from dict_functions import update_dict_occurences, update_dict_amount, sort_dict, output_csv, print_dict_or_tuple_list
-from progress_bar import progress
+from analysis.dict_functions import update_dict_occurences, update_dict_amount, sort_dict, output_csv, print_dict_or_tuple_list
+from analysis.progress_bar import progress
 
 
 class Analyzer:
@@ -81,7 +81,7 @@ class Analyzer:
                 update_dict_occurences(self.__verbs, item.attrib['text'])
 
             # Updates total Tag-Count
-            update_dict_occurences(self.__total_tag, item)
+            update_dict_occurences(self.__total_tag, tag)
 
     def __update_trigger_dict(self, tag, signal_dict, key):
         """

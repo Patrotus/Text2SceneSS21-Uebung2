@@ -1,9 +1,9 @@
 import os
 import spacy
-from analyzer import Analyzer
-from file_analyzer import FileAnalyzer
-from progress_bar import progress
-from question import question
+from analysis.analyzer import Analyzer
+from analysis.file_analyzer import FileAnalyzer
+from analysis.progress_bar import progress
+from analysis.question import question
 
 # Loads the nlp model
 NLP = spacy.load("en_core_web_sm")
@@ -30,15 +30,15 @@ def analyze_all_files(path):
             progress(prog, file_count, 'Reading files')
     print('\n[INFO] Done reading files.')
 
-    # Outputs stuff
-    A = Analyzer(fa_array)
-    if question('Do you want to see the sentence distribution?'):
-        A.plot_sentence_distribution()
+    if len(fa_array) > 0:
+        # Outputs stuff
+        A = Analyzer(fa_array)
+        if question('Do you want to see the sentence distribution?'):
+            A.plot_sentence_distribution()
 
-    # TODO: Remove me
-    A.debug()
+        # TODO: Remove me
+        A.debug()
 
-    if question('Do you want to save the results?'):
         path = A.output_results_files()
         print(f'[INFO] Files saved at: {os.path.abspath(path)}')
 
