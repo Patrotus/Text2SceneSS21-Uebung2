@@ -1,6 +1,6 @@
-Um die Anwendung auszuführen muss zunächst ein neues Conda-Enviroment angelegt werden mit `conda env create -f t2s_uebung.yml`  
+Um die Anwendung auszuführen muss zunächst ein neues Conda-Enviroment angelegt werden mit `conda env create -f t2s_uebung.yml` oder `conda create --name <env> --file requirements.txt`
 Anschließend muss dieses mit `activate t2s_uebung` aktiviert werden.  
 
-Alternativ kann auch die Datei `requirements_std` genutzt werden, um die benötigten Pakete mit `python -m pip install -r requirements_std.txt` systemweit zu installieren.
+Alternativ kann auch die Datei `requirements.txt` genutzt werden, um die benötigten Pakete mit `python -m pip install -r requirements.txt` systemweit zu installieren.
 
 Um das Programm durchlaufen zu lassen, genügt es die `run.py`-Datei mit `python3 run.py` auszuführen.
