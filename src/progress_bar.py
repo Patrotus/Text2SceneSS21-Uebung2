@@ -1,11 +1,12 @@
 import sys
 
-def progress(count, total, suffix=''):
+
+def progress(count, total, text=''):
     """
-    Renders a progress bar
+    Renders a simple progress bar
     :param count: Current count
     :param total: Total count of objects
-    :param suffix: Message at the end of the bar
+    :param text: Message at the end of the bar
     """
     bar_len = 60
     filled_len = int(round(bar_len * count / float(total)))
@@ -13,5 +14,5 @@ def progress(count, total, suffix=''):
     percents = round(100.0 * count / float(total), 1)
     bar = '=' * filled_len + '-' * (bar_len - filled_len)
 
-    sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', suffix))
+    sys.stdout.write(f'{bar} {percents}% ...{text}\r')
     sys.stdout.flush()
