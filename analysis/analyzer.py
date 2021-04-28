@@ -120,11 +120,12 @@ class Analyzer:
         :rtype: string: Path to file
         """
         file_path = os.path.join(__file__, '..', '..', 'results', 'csv')
-        output_csv(file_path, 'total_pos', sort_dict(self.__total_pos, True), ['PoS', 'Amount'])
-        output_csv(file_path, 'total_tag', sort_dict(self.__total_tag, True), ['Tag', 'Amount'])
-        output_csv(file_path, 'total_qs_type', sort_dict(self.__qs_type_dict, True), ['QSLINK-relType', 'Amount'])
-        output_csv(file_path, 'top_5_verbs', self.__verbs_array, ['Verb', 'Amount'])
-        [output_csv(file_path, f'total_link_{key}', sort_dict(self.__link_pre[key], True), ['Trigger', 'Amount'])
+        output_csv(file_path, 'total_pos', sort_dict(self.__total_pos, True), ['pos', 'amount'])
+        output_csv(file_path, 'total_tag', sort_dict(self.__total_tag, True), ['tag', 'amount'])
+        output_csv(file_path, 'total_qs_type', sort_dict(self.__qs_type_dict, True), ['qslink_rel_type', 'amount'])
+        output_csv(file_path, 'top_5_verbs', self.__verbs_array, ['verb', 'amount'])
+        output_csv(file_path, 'sentence_distribution', self.__sentences_array, ['sentence_length', 'amount'])
+        [output_csv(file_path, f'total_link_{key}', sort_dict(self.__link_pre[key], True), ['trigger', 'amount'])
          for key in self.__link_pre]
         return file_path
 
