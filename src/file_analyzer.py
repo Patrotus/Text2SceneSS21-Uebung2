@@ -110,7 +110,8 @@ class FileAnalyzer:
         if not os.path.exists(save_location):
             os.makedirs(save_location)
 
-        graph.render(os.path.join(save_location, f'{file_name}.gv'), view=question('Do you want to see the resulting graph?'))
+        graph.render(os.path.join(save_location, f'{file_name}.gv'),
+                     view=question('Do you want to see the resulting graph?'))
 
     @staticmethod
     def remove_and_replace(old, new, tags):

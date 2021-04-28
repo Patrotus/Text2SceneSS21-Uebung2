@@ -115,7 +115,7 @@ class Analyzer:
         """
         file_path = os.path.join('..', 'results', 'csv')
         output_csv(file_path, 'total_pos', sort_dict(self.__total_pos, True), ['PoS', 'Amount'])
-        output_csv(file_path, '__total_tag', sort_dict(self.__total_tag, True), ['Tag', 'Amount'])
+        output_csv(file_path, 'total_tag', sort_dict(self.__total_tag, True), ['Tag', 'Amount'])
         output_csv(file_path, 'total_qs_type', sort_dict(self.__qs_type_dict, True), ['QSLINK-relType', 'Amount'])
         output_csv(file_path, 'top_5_verbs', self.__verbs_array, ['Verb', 'Amount'])
         [output_csv(file_path, f'total_link_{key}', sort_dict(self.__link_pre[key], True), ['Trigger', 'Amount'])
