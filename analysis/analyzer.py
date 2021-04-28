@@ -95,10 +95,11 @@ class Analyzer:
             if trigger in signal_dict:
                 update_dict_occurences(self.__link_pre[key], signal_dict[trigger])
 
-    def plot_sentence_distribution(self):
+    def plot_sentence_distribution(self, show=True):
         """
         Plots the distribution of the sentences lengths
         """
+        file_path = os.path.join('results', 'sentence_distribution.png')
         x_val, y_val = [], []
         for x in self.__sentences_array:
             x_val.append(x[0])
@@ -106,14 +107,17 @@ class Analyzer:
         plt.scatter(x_val, y_val, s=2, c="black", marker='o')
         plt.ylabel('Occurrences')
         plt.xlabel('Sentence Length')
-        plt.show()
+        if show:
+            plt.show()
+        plt.savefig(file_path)
+
 
     def output_results_files(self):
         """
         Puts all results of the analysis in a .csv
         :rtype: string: Path to file
         """
-        file_path = os.path.join('..', 'results', 'csv')
+        file_path = os.path.join('results', 'csv')
         output_csv(file_path, 'total_pos', sort_dict(self.__total_pos, True), ['PoS', 'Amount'])
         output_csv(file_path, 'total_tag', sort_dict(self.__total_tag, True), ['Tag', 'Amount'])
         output_csv(file_path, 'total_qs_type', sort_dict(self.__qs_type_dict, True), ['QSLINK-relType', 'Amount'])

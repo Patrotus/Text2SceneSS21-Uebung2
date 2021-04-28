@@ -33,8 +33,8 @@ def analyze_all_files(path):
     if len(fa_array) > 0:
         # Outputs stuff
         A = Analyzer(fa_array)
-        if question('Do you want to see the sentence distribution?'):
-            A.plot_sentence_distribution()
+
+        A.plot_sentence_distribution(question('Do you want to see the sentence distribution?'))
 
         # TODO: Remove me
         A.debug()
