@@ -1,6 +1,5 @@
-Um die Anwendung auszuführen muss zunächst ein neues Conda-Enviroment angelegt werden mit `conda env create -f t2s_uebung.yml` oder `conda create --name <env> --file requirements.txt`
-Anschließend muss dieses mit `activate t2s_uebung` aktiviert werden.  
+Um die Anwendung auszuführen muss zunächst ein neues Conda-Enviroment angelegt werden mit `conda env create -name <name> -f t2s_uebung.yml`
+Anschließend muss dieses mit `activate <name>` aktiviert werden.  
+U.U. kann das Paket `en-core-web-sm` nicht gefunden werden. Dann muss dieses mit `python -m spacy download en_core_web_sm` manuell installiert werden.
 
-Alternativ kann auch die Datei `requirements.txt` genutzt werden, um die benötigten Pakete mit `python -m pip install -r requirements.txt` systemweit zu installieren.
-
-Um das Programm durchlaufen zu lassen, genügt es die `run.py`-Datei mit `python3 run.py` auszuführen.
+Um das Programm durchlaufen zu lassen, genügt es die `run.py`-Datei mit `python run.py` auszuführen.
