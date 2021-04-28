@@ -1,8 +1,11 @@
 import os
 import xml.etree.ElementTree as EleTr
-from dict_functions import update_dict_occurences
 import graphviz as gviz
 
+from dict_functions import update_dict_occurences
+from question import question
+
+# Constants defining the color and arrow style for some tags
 NODE_TAGS = {
     'PLACE': 'green',
     'LOCATION': 'lightblue',
@@ -19,73 +22,80 @@ EDGE_TAGS = {
 
 
 class FileAnalyzer:
+    """
+    Handles the analysis of one file
+    :param path: path of the file to be analyzed
+    :param nlp: the NLP provided by spacy
+    """
     def __init__(self, path, nlp):
-        """
-        Initializer for the FileAnalyzer
-        :param path: path of the file to be analyzed
-        :param nlp: the nlp provided by spacy
-        """
+        # Sets variables
         self.path = path
         root = EleTr.parse(path).getroot()
-
         text = root.findall('TEXT')[0].text
-        self.tags = root.findall('TAGS')[0]
-        self.doc = nlp(text)
-        self.pos_counter = self.create_pos_counter_dict()
-        self.sentences = self.create_sentences_array()
 
-    def create_pos_counter_dict(self):
+        self.doc = nlp(text)
+        self.tags = root.findall('TAGS')[0]
+        self.pos_counter = self.create_pos_counter()
+        self.sentences = [len(sent) for sent in self.doc.sents]
+
+    def create_pos_counter(self):
+        """
+        Creates a dictionary holding the distribution of all PoS-
+        :return: dict: A dictionary of the PoS distribution
+        """
         pos_counter = {}
         for token in self.doc:
-            pos = token.pos_
-            update_dict_occurences(pos_counter, pos)
+            update_dict_occurences(pos_counter, token.pos_)
         return pos_counter
 
-    def create_sentences_array(self):
-        sentences = []
-        for sent in self.doc.sents:
-            sentences.append(len(sent.text))
-        sentences = [len(sent) for sent in self.doc.sents]
-        return sentences
-
     def get_pos_counter(self):
+        """
+        :return: dict: A dictionary of the PoS distribution
+        """
         return self.pos_counter
 
     def get_tags(self):
+        """
+        :return: The elment of the element-tree holding all tags
+        """
         return self.tags
 
     def get_sentences(self):
+        """
+        :return: List of all sentence-lengths
+        """
         return self.sentences
 
     def visualize(self):
+        """
+        Creates a Graph showing the relation between the different Tags
+        """
         file_name = self.path.split(os.sep)[-1][0:-4]
+        print(f'--- {file_name} ---')
 
         graph = gviz.Digraph(comment=file_name, engine='circo')
 
-        tags = self.tags
-        metalink_tags = [tag for tag in tags if tag.tag == 'METALINK']
-        rest_tags = [tag for tag in tags if tag.tag != 'METALINK']
+        # Filters the tags in METALINK and non METALINK tags
+        metalink_tags = [tag for tag in self.tags if tag.tag == 'METALINK']
+        non_metalink_tags = [tag for tag in self.tags if tag.tag != 'METALINK']
+
+        # Iterates over all Metalinks and merges two tags if necessary
         for tag in metalink_tags:
             from_id, to_id = tag.attrib['fromID'], tag.attrib['toID']
-            rest_tags = self.remove_and_replace(from_id, to_id, rest_tags)
+            non_metalink_tags = self.remove_and_replace(from_id, to_id, non_metalink_tags)
 
-        # TODO: Tags vorher mergen
-        merged_tags = []
-
-        node_tags = [tag for tag in rest_tags if tag.tag in NODE_TAGS]
-        edge_tags = [tag for tag in rest_tags if tag.tag in EDGE_TAGS]
+        # Filters the non METALINK tags in Nodes and Endges
+        node_tags = [tag for tag in non_metalink_tags if tag.tag in NODE_TAGS]
+        edge_tags = [tag for tag in non_metalink_tags if tag.tag in EDGE_TAGS]
 
         # Renders all Nodes
-        count = 0
         for tag in node_tags:
-            count += 1
             graph.node(name=tag.attrib['id'], label=tag.attrib['text'], fillcolor=NODE_TAGS[tag.tag], style='filled')
 
         # Renders all Edges
         for tag in edge_tags:
-            tag_name = tag.tag
             graph.edge(tail_name=tag.attrib['fromID'], head_name=tag.attrib['toID'], label=tag.attrib['relType'],
-                       style=EDGE_TAGS[tag_name])
+                       style=EDGE_TAGS[tag.tag])
 
         # Renders a legend explaining the colors and arrows
         label = '<<TABLE>'
@@ -95,14 +105,23 @@ class FileAnalyzer:
         label += '</TABLE>>'
         graph.attr(label=label)
 
-        print(count)
+        # Outputs the files
+        save_location = os.path.join('..', 'results', 'graph')
+        if not os.path.exists(save_location):
+            os.makedirs(save_location)
 
-        file_name = f'test-output/{file_name}.gv'
-        graph.render(file_name, view=True)
-        os.remove(file_name)
+        graph.render(os.path.join(save_location, f'{file_name}.gv'), view=question('Do you want to see the resulting graph?'))
 
-    #FIXME: Ist das richtig so?
-    def remove_and_replace(self, old, new, tags):
+    @staticmethod
+    def remove_and_replace(old, new, tags):
+        """
+        Updates the list of non_metalink_tags on a merge by updating the ids to the tag leftover and removing the
+        merged 'old' tag.
+        :param old: ID of the old tag
+        :param new: ID of the new tag
+        :param tags: List of all tags
+        :return: list: List of updated tags
+        """
         for tag in tags:
             if tag.attrib['id'] == old:
                 tags.remove(tag)

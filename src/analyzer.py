@@ -64,24 +64,24 @@ class Analyzer:
         # Gets all SPATIAL_SIGNAL from the tags
         spatial_signal_tags = {item.attrib['id']: item.attrib['text'] for item in fa_tags.findall("SPATIAL_SIGNAL")}
 
-        for tag in fa_tags:
-            tag = tag.tag
+        for item in fa_tags:
+            tag = item.tag
 
             # Updates QSLINK type distribution
             if tag == 'QSLINK':
-                update_dict_occurences(self.__qs_type_dict, tag.attrib['relType'])
-                self.__update_trigger_dict(tag, spatial_signal_tags, 'QSLINK')
+                update_dict_occurences(self.__qs_type_dict, item.attrib['relType'])
+                self.__update_trigger_dict(item, spatial_signal_tags, 'QSLINK')
 
             # Updates the preposition distribution for QS and OLINK
             elif tag == 'OLINK':
-                self.__update_trigger_dict(tag, spatial_signal_tags, 'OLINK')
+                self.__update_trigger_dict(item, spatial_signal_tags, 'OLINK')
 
             # Updates the distribution for motion __verbs
             elif tag == 'MOTION':
-                update_dict_occurences(self.__verbs, tag.attrib['text'])
+                update_dict_occurences(self.__verbs, item.attrib['text'])
 
             # Updates total Tag-Count
-            update_dict_occurences(self.__total_tag, tag)
+            update_dict_occurences(self.__total_tag, item)
 
     def __update_trigger_dict(self, tag, signal_dict, key):
         """
@@ -111,6 +111,7 @@ class Analyzer:
     def output_results_files(self):
         """
         Puts all results of the analysis in a .csv
+        :rtype: string: Path to file
         """
         file_path = os.path.join('..', 'results', 'csv')
         output_csv(file_path, 'total_pos', sort_dict(self.__total_pos, True), ['PoS', 'Amount'])
@@ -119,6 +120,7 @@ class Analyzer:
         output_csv(file_path, 'top_5_verbs', self.__verbs_array, ['Verb', 'Amount'])
         [output_csv(file_path, f'total_link_{key}', sort_dict(self.__link_pre[key], True), ['Trigger', 'Amount'])
          for key in self.__link_pre]
+        return file_path
 
     def debug(self):
         """
