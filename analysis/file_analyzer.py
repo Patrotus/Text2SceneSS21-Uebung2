@@ -106,7 +106,7 @@ class FileAnalyzer:
         graph.attr(label=label)
 
         # Outputs the files
-        save_location = os.path.join('results', 'graph')
+        save_location = os.path.join(__file__, '..', '..', 'results', 'graph')
         if not os.path.exists(save_location):
             os.makedirs(save_location)
 

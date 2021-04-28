@@ -3,4 +3,4 @@ Anschließend muss dieses mit `activate t2s_uebung` aktiviert werden.
 
 Alternativ kann auch die Datei `requirements_std` genutzt werden, um die benötigten Pakete mit `python -m pip install -r requirements_std.txt` systemweit zu installieren.
 
-Um das Programm auszuführen, sollte man mit 
+Um das Programm durchlaufen zu lassen, genügt es die `run.py`-Datei mit `python3 run.py` auszuführen.
